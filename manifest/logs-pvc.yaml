@@ -1,0 +1,12 @@
+# This configuration is mean tfor a single node deployment as a development environment.
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: airflow-logs-pvc
+spec:
+  storageClassName: airflow-logs
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi

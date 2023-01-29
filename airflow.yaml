@@ -1,0 +1,98 @@
+#                 ,,              ,...  ,,
+#       db        db            .d' ""`7MM
+#      ;MM:                     dM`     MM
+#     ,V^MM.    `7MM  `7Mb,od8 mMMmm    MM  ,pW"Wq.`7M'    ,A    `MF'
+#    ,M  `MM      MM    MM' "'  MM      MM 6W'   `Wb VA   ,VAA   ,V
+#    AbmmmqMA     MM    MM      MM      MM 8M     M8  VA ,V  VA ,V
+#   A'     VML    MM    MM      MM      MM YA.   ,A9   VVV    VVV
+# .AMA.   .AMMA..JMML..JMML.  .JMML.  .JMML.`Ybmd9'     W      W
+#
+# Author: r3d5un <https://github.com/r3d5un>
+
+airflow:
+  fernetKey: "" # Added as secret
+  webserverSecretKey: "" # Added as secret
+  extraEnv:
+    - name: AIRFLOW__CORE__FERNET_KEY
+      valueFrom:
+        secretKeyRef:
+          name: airflow-secrets
+          key: airflow-fernet-key
+    - name: AIRFLOW__WEBSERVER__SECRET_KEY
+      valueFrom:
+        secretKeyRef:
+          name: airflow-secrets
+          key: airflow-webserver-key
+  config:
+    AIRFLOW__CORE__LOGGING_LEVEL: DEBUG
+    AIRFLOW__CELERY__WORKER_CONCURRENCY: 8
+  users:
+    - username: r3d5un
+      firstName: r3d5un
+      lastName: 8blu3m00n
+      email: r3d5un@r3d5un.me
+      role: Admin
+      password: ${PASSWORD}
+  usersTemplates:
+    PASSWORD:
+      kind: secret
+      name: airflow-secrets
+      key: r3d5un-password
+  # Configured for single node usage. `KuebrnetesExecutor` only makes tasks use
+  # resources when tasks are running. `CeleryExecutor` requires workers and
+  # servers to be running at all times.
+  executor: KubernetesExecutor
+
+scheduler:
+  replicas: 1
+  logCleanup:
+    enabled: true
+
+web:
+  replicas: 1
+  service:
+    type: NodePort
+    externalPort: 8080
+    loadBalancerIP: ""
+    loadBalancerSourceRanges: []
+    nodePort:
+      http: "31100"
+  logCleanup:
+    enabled: true
+
+triggerer:
+  replicas: 1
+
+logs:
+  path: /opt/airflow/logs
+  persistence:
+    enabled: false
+    existingClaim: airflow-logs-pvc
+    accessMode: ReadWriteMany
+
+dags:
+  path: /opt/airflow/dags/repo/dags
+  persistence:
+    enabled: true
+    existingClaim: airflow-dags-pvc
+    accessMode: ReadWriteMany
+
+## Embedded Postgres
+pgbouncer:
+  enabled: true
+
+postgresql:
+  # The embedded PostgreSQL database is not suitable for production
+  enabled: true
+
+workers:
+  # Set to false because the `airflow.executor` is `KubernetesExecutor`
+  enabled: false
+
+flower:
+  # Set to false because the `airflow.executor` is `KubernetesExecutor`
+  enabled: false
+
+redis:
+  # Set to false because the `airflow.executor` is `KubernetesExecutor`
+  enabled: false

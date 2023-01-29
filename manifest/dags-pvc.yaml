@@ -1,0 +1,12 @@
+# This configuration is meant for a single node deployment as a development environment.
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: airflow-dags-pvc
+spec:
+  storageClassName: airflow-dags
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi

@@ -1,0 +1,17 @@
+# This configuration is mean for a single node deployment as a development environment.
+# It is not meant for production use.
+# IMPORTANT: The host path must be edited to match your environment.
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: airflow-logs-pv
+  labels:
+    type: local
+spec:
+  storageClassName: airflow-logs
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: "/home/r3d5un/Volumes/Airflow/Logs"
