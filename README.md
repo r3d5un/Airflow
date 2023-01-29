@@ -14,7 +14,7 @@ The installation requires that the user has setup:
 
 ## Installing
 
-- Add the [Airflow Helm Repository] to Helm.
+- Add the [Airflow Helm Repository](https://github.com/airflow-helm/charts) to Helm.
 
 ```bash
 helm repo add airflow-stable https://airflow-helm.github.io/charts
