@@ -1,6 +1,6 @@
 # Airflow
 
-This is a reference configuration of the [Airflow Helm Chart](https://github.com/airflow-helm/charts) and a few [DAGs](https://airflow.apache.org/docs/apache-airflow/stable/core-concepts/dags.html) for reference and learning.
+This is a reference configuration of the [Airflow Helm Chart](https://github.com/airflow-helm/charts) and a few [DAGs](https://airflow.apache.org/docs/apache-airflow/stable/core-concepts/dags.html) serving as demos.
 
 ## Prerequisites
 
@@ -8,7 +8,7 @@ The installation requires that the user has setup:
 
 - A working Kubernetes install (this configuration assumes a single-node cluster)
 
-- The [Helm Package Manager]
+- The [Helm Package Manager](https://helm.sh/)
 
 - Python 3.8+
 
