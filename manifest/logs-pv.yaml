@@ -14,4 +14,4 @@ spec:
   accessModes:
     - ReadWriteMany
   hostPath:
-    path: "/home/r3d5un/Volumes/Airflow/Logs"
+    path: "/host/Development/volumes/airflow/logs"
