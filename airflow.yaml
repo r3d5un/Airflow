@@ -10,6 +10,9 @@
 # Author: r3d5un <https://github.com/r3d5un>
 
 airflow:
+  image:
+    repository: apache/airflow
+    tag: latest-python3.10
   fernetKey: "" # Added as secret
   webserverSecretKey: "" # Added as secret
   extraEnv:
@@ -71,7 +74,7 @@ logs:
     accessMode: ReadWriteMany
 
 dags:
-  path: /opt/airflow/dags/repo/dags
+  path: /opt/airflow/dags
   persistence:
     enabled: true
     existingClaim: airflow-dags-pvc
