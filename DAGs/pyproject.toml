@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "dags"
+version = "0.1.0"
+description = ""
+authors = ["r3d5un <r3d5un@pm.me>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+apache-airflow = "^2.5.2"
+pandas = "^1.5.3"
+
+[tool.poetry.group.dev.dependencies]
+black = "^23.1.0"
+ruff = "^0.0.257"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
