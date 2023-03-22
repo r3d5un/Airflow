@@ -70,8 +70,6 @@ logs:
   path: /opt/airflow/logs
   persistence:
     enabled: false
-    existingClaim: airflow-logs-pvc
-    accessMode: ReadWriteMany
 
 dags:
   path: /opt/airflow/dags
@@ -82,11 +80,23 @@ dags:
 
 ## Embedded Postgres
 pgbouncer:
-  enabled: true
+  enabled: false
 
 postgresql:
   # The embedded PostgreSQL database is not suitable for production
-  enabled: true
+  # See https://github.com/r3d5un/PostgreSQL for Minikube PostgreSQL setup
+  enabled: false
+
+externalDatabase:
+  type: postgres
+  host: postgresql.postgres
+  port: 5432
+  database: airflow
+  userSecret: "airflow-postgres-credentials"
+  userSecretKey: "username"
+  passwordSecret: "airflow-postgres-credentials"
+  passwordSecretKey: "password"
+  properties: "?sslmode=disable"
 
 workers:
   # Set to false because the `airflow.executor` is `KubernetesExecutor`
