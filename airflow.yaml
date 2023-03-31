@@ -26,7 +26,17 @@ airflow:
         secretKeyRef:
           name: airflow-secrets
           key: airflow-webserver-key
+  extraVolumes:
+    - name: storage
+      hostPath:
+        path: "/host/Cluster/Storage"
+        type: Directory
+  extraVolumeMounts:
+    - name: storage
+      mountPath: "/storage"
   config:
+    AIRFLOW__CORE__DEFAULT_TIMEZONE: "Europe/Oslo"
+    AIRFLOW__CORE__DEFAULT_UI_TIMEZONE: "Europe/Oslo"
     AIRFLOW__CORE__LOGGING_LEVEL: DEBUG
     AIRFLOW__CELERY__WORKER_CONCURRENCY: 8
   users:
@@ -41,10 +51,29 @@ airflow:
       kind: secret
       name: airflow-secrets
       key: r3d5un-password
-  # Configured for single node usage. `KuebrnetesExecutor` only makes tasks use
-  # resources when tasks are running. `CeleryExecutor` requires workers and
-  # servers to be running at all times.
-  executor: KubernetesExecutor
+  executor: CeleryExecutor
+
+# Celery Worker Configs
+workers:
+  ## if the airflow workers StatefulSet should be deployed
+  ##
+  enabled: true
+  replicas: 3
+  logCleanup:
+    enabled: true
+
+## Triggerer
+triggerer:
+  replicas: 1
+
+# Flower Configs
+flower:
+  ## if the airflow flower UI should be deployed
+  ##
+  enabled: false
+  replicas: 1
+  service:
+    type: LoadBalancer
 
 scheduler:
   replicas: 1
@@ -97,15 +126,3 @@ externalDatabase:
   passwordSecret: "airflow-postgres-credentials"
   passwordSecretKey: "password"
   properties: "?sslmode=disable"
-
-workers:
-  # Set to false because the `airflow.executor` is `KubernetesExecutor`
-  enabled: false
-
-flower:
-  # Set to false because the `airflow.executor` is `KubernetesExecutor`
-  enabled: false
-
-redis:
-  # Set to false because the `airflow.executor` is `KubernetesExecutor`
-  enabled: false
