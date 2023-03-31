@@ -15,6 +15,9 @@ pandas = "^1.5.3"
 black = "^23.1.0"
 ruff = "^0.0.257"
 
+[tool.ruff]
+line-length = 88
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
