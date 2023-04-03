@@ -3,8 +3,6 @@ from sqlalchemy import (
     DateTime,
     Integer,
     PrimaryKeyConstraint,
-    Index,
-    asc,
     String,
     Column,
 )
@@ -18,7 +16,6 @@ class UnitBase(BrregBase):
     __tablename__ = "units"
     __table_args__ = (
         PrimaryKeyConstraint("organization_id"),
-        Index("idx_organization_id", asc("organization_id"), postgresql_using="btree"),
     )
 
     organization_id = Column("organization_id", String(25), nullable=False)

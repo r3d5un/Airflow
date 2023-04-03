@@ -1,11 +1,10 @@
-from sqlalchemy import PrimaryKeyConstraint, asc, Index, String, Column
+from sqlalchemy import PrimaryKeyConstraint, String, Column
 
 from lib.models.unit_base import UnitBase
 
 class UnitStaging(UnitBase):
     __table_args__ = (
         PrimaryKeyConstraint("organization_id"),
-        Index("idx_organization_id", asc("organization_id"), postgresql_using="btree"),
         {"schema": "staging"}
     )
 
