@@ -5,7 +5,7 @@ from lib.models import Base
 
 class BrregBase(Base):
     __abstract__ = True
-    __tablename__ = "units"
+    __tablename__ = "brreg_units"
 
     @staticmethod
     def get_dropped_columns() -> list:

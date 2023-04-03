@@ -13,7 +13,7 @@ from lib.models.brreg_base import BrregBase
 
 class UnitBase(BrregBase):
     __abstract__ = True
-    __tablename__ = "units"
+    __tablename__ = "brreg_units"
     __table_args__ = (
         PrimaryKeyConstraint("organization_id"),
     )
