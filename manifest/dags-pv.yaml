@@ -14,4 +14,4 @@ spec:
   accessModes:
     - ReadWriteMany
   hostPath:
-    path: "/host/Nextcloud/dev/projects/Airflow/DAGs"
+    path: "/host/Development/Projects/Airflow/DAGs"
