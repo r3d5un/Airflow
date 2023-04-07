@@ -18,3 +18,9 @@ class DatabaseCredentials:
         self.user = user
         self.password = password
         self.database = database
+
+    def __repr__(self) -> str:
+        return (
+            f"<{self.__class__.__name__}(database_type:{self.database_type})"
+            f"host:{self.host}, port:{self.port}, database:{self.database})>"
+        )

@@ -59,7 +59,7 @@ with DAG(
     extract = PythonOperator(
         task_id="download_subunits",
         python_callable=download_brreg_gzip,
-        op_kwargs={"config": brreg_config}
+        op_kwargs={"config": brreg_config},
     )
 
     unzip = PythonOperator(
@@ -133,6 +133,6 @@ with DAG(
         },
     )
 
-    extract >> unzip >> transform >> load >> switcharoo >> [cleanup, analyze]
+    extract >> unzip >> transform >> load >> switcharoo >> [cleanup, analyze]  # type: ignore
 
-    [create_staging, create_public] >> load
+    [create_staging, create_public] >> load  # type: ignore

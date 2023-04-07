@@ -133,6 +133,6 @@ with DAG(
         },
     )
 
-    extract >> unzip >> transform >> load >> switcharoo >> [cleanup, analyze]
+    extract >> unzip >> transform >> load >> switcharoo >> [cleanup, analyze]  # type: ignore
 
-    [create_staging, create_public] >> load
+    [create_staging, create_public] >> load  # type: ignore
