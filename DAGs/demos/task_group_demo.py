@@ -26,6 +26,6 @@ with DAG(
         task_3 = EmptyOperator(task_id="task_3")
         task_4 = EmptyOperator(task_id="task_4")
 
-        task_1 >> [task_2, task_3] >> task_4
+        task_1 >> [task_2, task_3] >> task_4  # type: ignore
 
-    start >> task_group_1 >> end
+    start >> task_group_1 >> end  # type: ignore

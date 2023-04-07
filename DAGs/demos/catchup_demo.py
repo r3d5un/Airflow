@@ -31,4 +31,4 @@ with DAG(
         task_id="logical_date", bash_command="echo 'Logical date: {{ ds }}'"
     )
 
-    execution_date >> interval_task >> logical_date
+    execution_date >> interval_task >> logical_date  # type: ignore

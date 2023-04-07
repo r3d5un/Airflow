@@ -31,4 +31,4 @@ with DAG(
             EmptyOperator(task_id=f"task_{task_list_number}")
             for task_list_number in task_list_numbers
         ]
-    )
+    )  # type: ignore

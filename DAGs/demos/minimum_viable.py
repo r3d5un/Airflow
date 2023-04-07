@@ -19,4 +19,4 @@ with DAG(
     start = EmptyOperator(task_id="start")
     end = EmptyOperator(task_id="end")
 
-    start >> end
+    start >> end  # type: ignore

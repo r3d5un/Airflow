@@ -24,4 +24,4 @@ with DAG(
     )
     end = EmptyOperator(task_id="end")
 
-    start >> template >> end
+    start >> template >> end  # type: ignore

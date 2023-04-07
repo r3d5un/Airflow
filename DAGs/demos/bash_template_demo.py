@@ -26,4 +26,4 @@ with DAG(
     )
     end = EmptyOperator(task_id="end")
 
-    start >> echo_stdout >> end
+    start >> echo_stdout >> end  # type: ignore
