@@ -14,9 +14,7 @@ from lib.models.brreg_base import BrregBase
 class UnitBase(BrregBase):
     __abstract__ = True
     __tablename__ = "brreg_units"
-    __table_args__ = (
-        PrimaryKeyConstraint("organization_id"),
-    )
+    __table_args__ = (PrimaryKeyConstraint("organization_id"),)
 
     organization_id = Column("organization_id", String(25), nullable=False)
     name = Column("name", String(255), nullable=False)
@@ -30,36 +28,26 @@ class UnitBase(BrregBase):
     bankruptcy = Column("bankruptcy", Boolean)
     liquidation = Column("liquidation", Boolean)
     forced_liquidation = Column("forced_liquidation", Boolean)
-    organization_type_code = Column(
-        "organization_type_code", String(25)
-    )
+    organization_type_code = Column("organization_type_code", String(25))
     postal_address_country = Column(
-        "postal_address_country", String(100),
+        "postal_address_country",
+        String(100),
     )
     postal_address_country_code = Column(
-        "postal_address_country_code", String(8),
+        "postal_address_country_code",
+        String(8),
     )
     postal_address_code = Column("postal_address_code", String(25))
     postal_address_place = Column("postal_address_place", String(100))
     postal_address = Column("postal_address", String(255))
     postal_address_county = Column("postal_address_county", String(100))
-    postal_address_county_number = Column(
-        "postal_address_county_number", String(25)
-    )
-    business_address_country = Column(
-        "business_address_country", String(100)
-    )
-    business_address_country_code = Column(
-        "business_address_country_code", String(8)
-    )
+    postal_address_county_number = Column("postal_address_county_number", String(25))
+    business_address_country = Column("business_address_country", String(100))
+    business_address_country_code = Column("business_address_country_code", String(8))
     business_address_code = Column("business_address_code", String(25))
-    business_address_place = Column(
-        "business_address_place", String(100)
-    )
+    business_address_place = Column("business_address_place", String(100))
     business_address = Column("business_address", String(255))
-    business_address_county = Column(
-        "business_address_county", String(100)
-    )
+    business_address_county = Column("business_address_county", String(100))
     business_address_county_number = Column(
         "business_address_county_number", String(25)
     )

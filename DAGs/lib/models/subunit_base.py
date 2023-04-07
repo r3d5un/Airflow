@@ -14,9 +14,7 @@ from lib.models.brreg_base import BrregBase
 class SubunitBase(BrregBase):
     __abstract__ = True
     __tablename__ = "brreg_subunits"
-    __table_args__ = (
-        PrimaryKeyConstraint("organization_id")
-    )
+    __table_args__ = PrimaryKeyConstraint("organization_id")
 
     organization_id = Column("organization_id", String(25), nullable=False)
     name = Column("name", String(255), nullable=False)

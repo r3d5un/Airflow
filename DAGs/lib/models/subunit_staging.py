@@ -2,6 +2,7 @@ from sqlalchemy import PrimaryKeyConstraint, String, Column
 
 from lib.models.subunit_base import SubunitBase
 
+
 class SubunitStaging(SubunitBase):
     __table_args__ = (
         PrimaryKeyConstraint("organization_id"),
@@ -12,4 +13,3 @@ class SubunitStaging(SubunitBase):
 
     def __init__(self, *initial_dictionary, **kwargs):
         super(SubunitStaging, self).__init__(*initial_dictionary, **kwargs)
-
