@@ -21,7 +21,7 @@ with DAG(
         "start_date": datetime(2022, 9, 22),
         "depends_on_past": False,
     },
-    template_searchpath=["/opt/airflow/dags/repo/dags/demos"]
+    template_searchpath=["/opt/airflow/dags/repo/dags/demos"],
 ) as dag:
     print_task = PythonOperator(
         task_id="print_airflow_variables",

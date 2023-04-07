@@ -23,7 +23,12 @@ with DAG(
     task_3 = EmptyOperator(task_id="task_3")
     task_4 = EmptyOperator(task_id="task_4")
 
-    task_1 >> [task_2, task_3] >> task_4 >> [
-        EmptyOperator(task_id=f"task_{task_list_number}")
-        for task_list_number in task_list_numbers
-    ]
+    (
+        task_1
+        >> [task_2, task_3]
+        >> task_4
+        >> [
+            EmptyOperator(task_id=f"task_{task_list_number}")
+            for task_list_number in task_list_numbers
+        ]
+    )
