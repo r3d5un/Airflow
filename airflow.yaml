@@ -12,7 +12,7 @@
 airflow:
   image:
     repository: apache/airflow
-    tag: latest-python3.10
+    tag: latest-python3.11
   fernetKey: "" # Added as secret
   webserverSecretKey: "" # Added as secret
   extraEnv:
