@@ -30,12 +30,12 @@ helm repo update
 
 > It is highly recommended to generate new secrets/passwords and keys for the `manifest/airflow-secrets.yaml` file. Instructions can be found in the comments of the file.
 
-``` bash
+```bash
 kubectl apply -f manifest/
 ```
 
 - Install Airflow.
 
-``` bash
-helm upgrade --cleanup-on-fail --install airflow airflow-stable/airflow -f airflow.yaml
+```bash
+helm upgrade --cleanup-on-fail --namespace airflow --install airflow airflow-stable/airflow -f airflow.yaml
 ```
