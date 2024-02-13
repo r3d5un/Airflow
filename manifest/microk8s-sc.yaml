@@ -1,0 +1,9 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: airflow-sc
+provisioner: microk8s.io/hostpath
+reclaimPolicy: Delete
+parameters:
+  pvDir: /home/r3d5un/Cluster
+volumeBindingMode: WaitForFirstConsumer
