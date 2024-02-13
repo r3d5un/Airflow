@@ -26,14 +26,15 @@ airflow:
         secretKeyRef:
           name: airflow-secrets
           key: airflow-webserver-key
-  extraVolumes:
-    - name: storage
-      hostPath:
-        path: "/host/Cluster/Storage"
-        type: Directory
-  extraVolumeMounts:
-    - name: storage
-      mountPath: "/storage"
+  # Configuration for Minikube host filesystem access
+  # extraVolumes:
+  #   - name: storage
+  #     hostPath:
+  #       path: "/host/Cluster/Storage"
+  #       type: Directory
+  # extraVolumeMounts:
+  #   - name: storage
+  #     mountPath: "/storage"
   config:
     AIRFLOW__CORE__DEFAULT_TIMEZONE: "Europe/Oslo"
     AIRFLOW__CORE__DEFAULT_UI_TIMEZONE: "Europe/Oslo"
@@ -115,7 +116,7 @@ postgresql:
 
 externalDatabase:
   type: postgres
-  host: postgresql.postgres
+  host: 10.0.1.1 # microk8s host-access IP
   port: 5432
   database: airflow
   userSecret: "airflow-postgres-credentials"
