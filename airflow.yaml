@@ -92,9 +92,6 @@ web:
   logCleanup:
     enabled: true
 
-triggerer:
-  replicas: 1
-
 logs:
   path: /opt/airflow/logs
   persistence:
