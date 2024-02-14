@@ -99,7 +99,7 @@ logs:
     enabled: false
 
 dags:
-  path: /opt/airflow/dags
+  path: /opt/airflow/dags/repo/dags
   persistence:
     enabled: true
     existingClaim: airflow-dags-pvc
