@@ -31,15 +31,13 @@ WHERE id = $1;`
 	qCtx, cancel := context.WithTimeout(ctx, *m.Timeout)
 	defer cancel()
 
+	var u Unit
+	var brregUnit []byte
+
 	m.Logger.InfoContext(qCtx, "querying unit", "query", stmt, "id", id)
 	row := m.DB.QueryRowContext(ctx, stmt, id)
-	u := &Unit{}
 
-	err := row.Scan(
-		&u.ID,
-		&u.LastUpdate,
-		&u.BRREGUnit,
-	)
+	err := row.Scan(&u.ID, &u.LastUpdate, brregUnit)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			m.Logger.InfoContext(ctx, "no records found", "query", stmt, "id", id)
@@ -51,15 +49,21 @@ WHERE id = $1;`
 	}
 	m.Logger.InfoContext(ctx, "data retrieved")
 
-	return u, nil
+	err = json.Unmarshal(brregUnit, &u.BRREGUnit)
+	if err != nil {
+		m.Logger.ErrorContext(ctx, "error unmarshaling brreg_unit", "error", err)
+		return nil, err
+	}
+
+	return &u, nil
 }
 
 func (m *UnitModel) Insert(ctx context.Context, u *Unit) (*Unit, error) {
 	query := `INSERT INTO brreg_units (
-id, last_update, brreg_unit
+id, last_updated, brreg_unit
 )
 VALUES ($1, $2, $3)
-RETURNING id, last_update, brreg_unit;`
+RETURNING id, last_updated, brreg_unit;`
 
 	jsonUnit, err := json.Marshal(u.BRREGUnit)
 	if err != nil {
@@ -75,9 +79,11 @@ RETURNING id, last_update, brreg_unit;`
 	rCtx, cancel := context.WithTimeout(ctx, 3*time.Second)
 	defer cancel()
 
+	var brregUnit []byte
+
 	m.Logger.InfoContext(rCtx, "inserting unit", "query", query, "args", args)
 	err = m.DB.QueryRowContext(ctx, query, args...).Scan(
-		&u.ID, &u.LastUpdate, &u.BRREGUnit,
+		&u.ID, &u.LastUpdate, &brregUnit,
 	)
 	if err != nil {
 		m.Logger.ErrorContext(
@@ -90,19 +96,25 @@ RETURNING id, last_update, brreg_unit;`
 			"error",
 			err,
 		)
-		return u, err
+		return nil, err
 	}
 	m.Logger.InfoContext(ctx, "unit inserted", "id", u.ID)
+
+	err = json.Unmarshal(brregUnit, &u.BRREGUnit)
+	if err != nil {
+		m.Logger.ErrorContext(ctx, "error unmarshaling brreg_unit", "error", err)
+		return nil, err
+	}
 
 	return u, nil
 }
 
 func (m *UnitModel) Upsert(ctx context.Context, u *Unit) (*Unit, error) {
-	query := `INSERT INTO posts (id, last_update, brreg_unit)
+	query := `INSERT INTO brreg_units (id, last_updated, brreg_unit)
 VALUES ($1, NOW(), $2)
 ON CONFLICT (id) DO UPDATE
-SET last_update = EXCLUDED.last_update, brreg_unit = EXCLUDED.brreg_unit
-RETURNING id, last_update, brreg_unit;`
+SET last_updated = EXCLUDED.last_updated, brreg_unit = EXCLUDED.brreg_unit
+RETURNING id, last_updated, brreg_unit;`
 
 	jsonUnit, err := json.Marshal(u.BRREGUnit)
 	if err != nil {
@@ -111,16 +123,17 @@ RETURNING id, last_update, brreg_unit;`
 
 	args := []any{
 		u.ID,
-		u.LastUpdate,
 		jsonUnit,
 	}
 
 	rCtx, cancel := context.WithTimeout(ctx, 3*time.Second)
 	defer cancel()
 
+	var brregUnit []byte
+
 	m.Logger.InfoContext(rCtx, "inserting unit", "query", query, "args", args)
 	err = m.DB.QueryRowContext(ctx, query, args...).Scan(
-		&u.ID, &u.LastUpdate, &u.BRREGUnit,
+		&u.ID, &u.LastUpdate, &brregUnit,
 	)
 	if err != nil {
 		m.Logger.ErrorContext(
@@ -137,14 +150,20 @@ RETURNING id, last_update, brreg_unit;`
 	}
 	m.Logger.InfoContext(ctx, "unit inserted", "id", u.ID)
 
+	err = json.Unmarshal(brregUnit, &u.BRREGUnit)
+	if err != nil {
+		m.Logger.ErrorContext(ctx, "error unmarshaling brreg_unit", "error", err)
+		return u, err
+	}
+
 	return u, nil
 }
 
 func (m *UnitModel) Update(ctx context.Context, u *Unit) (*Unit, error) {
-	query := `UPDATE posts
-SET id = $2, last_update = NOW(), brreg_unit = $4
+	query := `UPDATE brreg_units
+SET id = $2, last_updated = NOW(), brreg_unit = $4
 WHERE id = $1
-RETURNING id, last_update, brreg_unit;
+RETURNING id, last_updated, brreg_unit;
     `
 
 	jsonUnit, err := json.Marshal(u.BRREGUnit)
@@ -160,9 +179,11 @@ RETURNING id, last_update, brreg_unit;
 	rCtx, cancel := context.WithTimeout(ctx, 3*time.Second)
 	defer cancel()
 
+	var brregUnit []byte
+
 	m.Logger.InfoContext(rCtx, "updating unit", "query", query, "args", args)
 	err = m.DB.QueryRowContext(ctx, query, args...).Scan(
-		&u.ID, &u.LastUpdate, &u.BRREGUnit,
+		&u.ID, &u.LastUpdate, &brregUnit,
 	)
 	if err != nil {
 		switch {
@@ -183,23 +204,29 @@ RETURNING id, last_update, brreg_unit;
 			return nil, err
 		}
 	}
-
 	m.Logger.InfoContext(rCtx, "updated brreg unit", "unit", u.BRREGUnit)
+
+	err = json.Unmarshal(brregUnit, &u.BRREGUnit)
+	if err != nil {
+		m.Logger.ErrorContext(ctx, "error unmarshaling brreg_unit", "error", err)
+		return u, err
+	}
 
 	return u, nil
 }
 
 func (m *UnitModel) Delete(ctx context.Context, id int) (*Unit, error) {
-	query := "DELETE FROM posts WHERE id = $1 RETURNING id, last_update, brreg_unit;"
+	query := "DELETE FROM brreg_units WHERE id = $1 RETURNING id, last_updated, brreg_unit;"
 
 	rCtx, cancel := context.WithTimeout(ctx, 3*time.Second)
 	defer cancel()
 
 	var u *Unit
+	var brregUnit []byte
 
 	m.Logger.InfoContext(rCtx, "deleting unit", "query", query, "id", id)
 	err := m.DB.QueryRowContext(ctx, query, id).Scan(
-		&u.ID, &u.LastUpdate, &u.BRREGUnit,
+		&u.ID, &u.LastUpdate, &brregUnit,
 	)
 	if err != nil {
 		switch {
@@ -220,8 +247,13 @@ func (m *UnitModel) Delete(ctx context.Context, id int) (*Unit, error) {
 			return nil, err
 		}
 	}
-
 	m.Logger.InfoContext(ctx, "unit deleted", "unit", u)
+
+	err = json.Unmarshal(brregUnit, &u.BRREGUnit)
+	if err != nil {
+		m.Logger.ErrorContext(ctx, "error unmarshaling brreg_unit", "error", err)
+		return u, err
+	}
 
 	return u, nil
 }
