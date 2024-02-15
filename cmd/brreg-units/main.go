@@ -8,42 +8,48 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log/slog"
 	"os"
+	"sync"
 	"time"
 
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/r3d5un/Airflow/internal/brreg/units"
+	"github.com/r3d5un/Airflow/internal/data"
 )
 
 type UnitSlice []units.Unit
 
 func main() {
-	data, err := os.ReadFile("./enheter_alle.json.gz")
+	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
+	slog.SetDefault(logger)
+
+	logger.Info("reading file")
+	file, err := os.ReadFile("./enheter_alle.json.gz")
 	if err != nil {
-		fmt.Println("Error reading file", err)
+		logger.Error("error reading file", "error", err)
 		os.Exit(1)
 	}
 
-	reader := bytes.NewReader(data)
+	logger.Info("unzipping file")
+	reader := bytes.NewReader(file)
 	gzReader, err := gzip.NewReader(reader)
 	if err != nil {
-		fmt.Println("Error creating gzip reader", err)
+		logger.Error("error unzipping file", "error", err)
 		os.Exit(1)
 	}
 
 	unzippedData, err := io.ReadAll(gzReader)
 	if err != nil {
-		fmt.Println("Error reading unzipped data", err)
+		logger.Error("error reading unzipped data", "error", err)
 		os.Exit(1)
 	}
 
+	logger.Info("marshalling data")
 	var units UnitSlice
 	err = json.Unmarshal(unzippedData, &units)
 
-	for _, unit := range units {
-		fmt.Println(unit.Navn)
-	}
-
+	logger.Info("opening db")
 	dsn := "postgres://postgres:postgres@localhost:5432/warehouse?sslmode=disable"
 	db, err := openDB(dsn)
 	if err != nil {
@@ -51,6 +57,43 @@ func main() {
 		os.Exit(1)
 	}
 	defer db.Close()
+
+	queryTimeout := time.Duration(10) * time.Second
+
+	models := data.NewModels(db, logger, &queryTimeout)
+
+	logger.Info("upserting units")
+	var wg sync.WaitGroup
+	unitChan := make(chan data.Unit, len(units))
+
+	for i := 0; i < 25; i++ {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			for u := range unitChan {
+				result, err := models.Units.Upsert(context.Background(), &u)
+				if err != nil {
+					logger.Error("error upserting unit", "error", err)
+					return
+				}
+
+				logger.Info("unit upserted", "id", result.ID)
+			}
+		}()
+	}
+
+	for _, u := range units {
+		record := data.Unit{
+			ID:        u.OrganisasjonsNummer,
+			BRREGUnit: &u,
+		}
+		unitChan <- record
+	}
+	close(unitChan)
+
+	wg.Wait()
+
+	logger.Info("all units upserted")
 }
 
 func openDB(dsn string) (*sql.DB, error) {
