@@ -12,9 +12,9 @@ import (
 )
 
 type Unit struct {
-	ID         int        `json:"id"`
-	LastUpdate *time.Time `json:"last_update"`
-	BRREGUnit  units.Unit `json:"brreg_unit"`
+	ID         string      `json:"id"`
+	LastUpdate *time.Time  `json:"last_updated"`
+	BRREGUnit  *units.Unit `json:"brreg_unit"`
 }
 
 type UnitModel struct {
@@ -23,13 +23,8 @@ type UnitModel struct {
 	Logger  *slog.Logger
 }
 
-func (m *UnitModel) Get(ctx context.Context, id int) (*Unit, error) {
-	if id < 1 {
-		m.Logger.InfoContext(ctx, "invalid id", "id", id)
-		return nil, ErrRecordNotFound
-	}
-	stmt := `
-SELECT id, last_update, brreg_unit
+func (m *UnitModel) Get(ctx context.Context, id string) (*Unit, error) {
+	stmt := `SELECT id, last_updated, brreg_unit
 FROM brreg_units
 WHERE id = $1;`
 
