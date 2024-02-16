@@ -23,6 +23,20 @@ type Unit struct {
 	Links                                     []string                 `json:"links"`
 }
 
+type SubUnit struct {
+	OrganisasjonsNummer             string            `json:"organisasjonsnummer"`
+	Navn                            string            `json:"navn"`
+	Organisasjonsform               Organisasjonsform `json:"organisasjonsform"`
+	RegistreringsdatoEnhetsregister string            `json:"registreringsdatoEnhetsregister"`
+	RegistrertIMvaRegisteret        bool              `json:"registrertIMvaregisteret"`
+	Naeringskode1                   NaeringsKode1     `json:"naeringskode1"`
+	AntallAnsatte                   int               `json:"antallAnsatte"`
+	OverordnetEnhet                 string            `json:"overordnetEnhet"`
+	OppstartsDato                   string            `json:"oppstartsDato"`
+	Beliggenhetsadresse             Address           `json:"beliggenhetsadresse"`
+	Links                           []string          `json:"links"`
+}
+
 type Organisasjonsform struct {
 	Kode        string   `json:"kode"`
 	Beskrivelse string   `json:"beskrivelse"`
