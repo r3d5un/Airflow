@@ -112,10 +112,13 @@ RETURNING id, parent_id, last_updated, brreg_subunit;`
 }
 
 func (m *SubUnitModel) Upsert(ctx context.Context, su *SubUnit) (*SubUnit, error) {
-	query := `INSERT INTO brreg_units (id, parent_id, last_updated, brreg_subunit)
+	query := `INSERT INTO brreg_subunits (id, parent_id, last_updated, brreg_subunit)
 VALUES ($1, $2, NOW(), $3)
 ON CONFLICT (id) DO UPDATE
-SET last_updated = EXCLUDED.last_updated, brreg_unit = EXCLUDED.brreg_subunit
+SET
+    last_updated = EXCLUDED.last_updated,
+    parent_id = EXCLUDED.parent_id,
+    brreg_subunit = EXCLUDED.brreg_subunit
 RETURNING id, parent_id, last_updated, brreg_subunit;`
 
 	jsonUnit, err := json.Marshal(su.BRREGSubUnit)
