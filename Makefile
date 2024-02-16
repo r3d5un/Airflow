@@ -44,3 +44,13 @@ run/docker/brreg/units:
 run/docker/brreg/subunits:
 	@echo 'Running BRREG Subunits ETL Process...'
 	docker run --network="host" brreg:latest -dataset subunits
+
+# ==================================================================================== #
+# BUILD
+# ==================================================================================== #
+
+## build/docker/brreg: run the app using docker compose
+.PHONY: build/docker/brreg
+build/docker/brreg:
+	@echo 'Building containerized BRREG CLI app...'
+	docker build -f ./dockerfiles/brreg.Dockerfile -t brreg:latest .
