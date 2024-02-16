@@ -28,3 +28,19 @@ vendor:
 	go mod verify
 	@echo 'Vendoring dependencies...'
 	go mod vendor
+
+# ==================================================================================== #
+# DEVELOPMENT
+# ==================================================================================== #
+
+## run/docker/brreg/units: Run the BRREG Units ETL Process
+.PHONY: run/docker/brreg/units
+run/docker/brreg/units:
+	@echo 'Running BRREG Units ETL Process...'
+	docker run --network="host" brreg:latest -dataset units
+
+## run/docker/brreg/subunits: Run the BRREG Subunits ETL Process
+.PHONY: run/docker/brreg/subunits
+run/docker/brreg/subunits:
+	@echo 'Running BRREG Subunits ETL Process...'
+	docker run --network="host" brreg:latest -dataset subunits
