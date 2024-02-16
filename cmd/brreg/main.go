@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
+	"net/http"
 	"os"
 	"sync"
 	"time"
@@ -55,26 +56,18 @@ func main() {
 
 	switch *dataset {
 	case "units":
-		logger.Info("reading file")
-		unzippedUnits, err := read("./enheter_alle.json.gz")
+		units, err := downloadUnits(logger)
 		if err != nil {
-			fmt.Println("Error reading file", err)
+			logger.Error("Error downloading subunits", err)
 			os.Exit(1)
 		}
-
-		var units UnitSlice
-		err = json.Unmarshal(unzippedUnits, &units)
 		ingestUnits(units, *workers, &models, logger)
 	case "subunits":
-		unzippedSubUnits, err := read("./underenheter_alle.json.gz")
+		subunits, err := downloadSubUnits(logger)
 		if err != nil {
-			fmt.Println("Error reading file", err)
+			logger.Error("Error downloading subunits", err)
 			os.Exit(1)
 		}
-
-		var subunits SubUnitSlice
-		err = json.Unmarshal(unzippedSubUnits, &subunits)
-
 		ingestSubUnits(subunits, *workers, &models, logger)
 	default:
 		logger.Error("no valid dataset selected")
@@ -82,6 +75,78 @@ func main() {
 	}
 
 	logger.Info("done")
+}
+
+func downloadSubUnits(logger *slog.Logger) (SubUnitSlice, error) {
+	logger.Info("downloading subunits")
+	resp, err := http.Get("https://data.brreg.no/enhetsregisteret/oppslag/underenheter/lastned/v2")
+	if err != nil {
+		fmt.Println("Error downloading file", err)
+		os.Exit(1)
+	}
+	defer resp.Body.Close()
+
+	logger.Info("unzipping subunits")
+	d, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	reader := bytes.NewReader(d)
+	gzReader, err := gzip.NewReader(reader)
+	if err != nil {
+		return nil, err
+	}
+
+	d, err = io.ReadAll(gzReader)
+	if err != nil {
+		return nil, err
+	}
+
+	logger.Info("unmarshalling subunits")
+	var subunits SubUnitSlice
+	err = json.Unmarshal(d, &subunits)
+	if err != nil {
+		return nil, err
+	}
+
+	return subunits, nil
+}
+
+func downloadUnits(logger *slog.Logger) (UnitSlice, error) {
+	logger.Info("downloading units")
+	resp, err := http.Get("https://data.brreg.no/enhetsregisteret/oppslag/enheter/lastned/v2")
+	if err != nil {
+		fmt.Println("Error downloading file", err)
+		os.Exit(1)
+	}
+	defer resp.Body.Close()
+
+	logger.Info("unzipping subunits")
+	d, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	reader := bytes.NewReader(d)
+	gzReader, err := gzip.NewReader(reader)
+	if err != nil {
+		return nil, err
+	}
+
+	d, err = io.ReadAll(gzReader)
+	if err != nil {
+		return nil, err
+	}
+
+	logger.Info("unmarshalling subunits")
+	var units UnitSlice
+	err = json.Unmarshal(d, &units)
+	if err != nil {
+		return nil, err
+	}
+
+	return units, nil
 }
 
 func read(path string) (d []byte, err error) {
