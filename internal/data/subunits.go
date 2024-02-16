@@ -137,7 +137,7 @@ RETURNING id, parent_id, last_updated, brreg_subunit;`
 
 	var brregUnit []byte
 
-	m.Logger.InfoContext(rCtx, "inserting subunit", "query", query, "args", args)
+	m.Logger.InfoContext(rCtx, "upserting subunit", "query", query, "args", args)
 	err = m.DB.QueryRowContext(ctx, query, args...).Scan(
 		&su.ID, &su.ParentID, &su.LastUpdate, &brregUnit,
 	)
@@ -154,7 +154,7 @@ RETURNING id, parent_id, last_updated, brreg_subunit;`
 		)
 		return su, err
 	}
-	m.Logger.InfoContext(ctx, "unit inserted", "id", su.ID)
+	m.Logger.InfoContext(ctx, "subunit upserted", "id", su.ID)
 
 	err = json.Unmarshal(brregUnit, &su.BRREGSubUnit)
 	if err != nil {

@@ -98,7 +98,7 @@ RETURNING id, last_updated, brreg_unit;`
 		)
 		return nil, err
 	}
-	m.Logger.InfoContext(ctx, "unit inserted", "id", u.ID)
+	m.Logger.InfoContext(ctx, "unit upserted", "id", u.ID)
 
 	err = json.Unmarshal(brregUnit, &u.BRREGUnit)
 	if err != nil {
@@ -131,7 +131,7 @@ RETURNING id, last_updated, brreg_unit;`
 
 	var brregUnit []byte
 
-	m.Logger.InfoContext(rCtx, "inserting unit", "query", query, "args", args)
+	m.Logger.InfoContext(rCtx, "upserting unit", "query", query, "args", args)
 	err = m.DB.QueryRowContext(ctx, query, args...).Scan(
 		&u.ID, &u.LastUpdate, &brregUnit,
 	)
