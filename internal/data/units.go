@@ -8,13 +8,13 @@ import (
 	"log/slog"
 	"time"
 
-	"github.com/r3d5un/Airflow/internal/brreg/units"
+	"github.com/r3d5un/Airflow/internal/brreg"
 )
 
 type Unit struct {
 	ID         string      `json:"id"`
 	LastUpdate *time.Time  `json:"last_updated"`
-	BRREGUnit  *units.Unit `json:"brreg_unit"`
+	BRREGUnit  *brreg.Unit `json:"brreg_unit"`
 }
 
 type UnitModel struct {

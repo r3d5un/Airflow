@@ -14,11 +14,11 @@ import (
 	"time"
 
 	_ "github.com/jackc/pgx/v5/stdlib"
-	"github.com/r3d5un/Airflow/internal/brreg/units"
+	"github.com/r3d5un/Airflow/internal/brreg"
 	"github.com/r3d5un/Airflow/internal/data"
 )
 
-type UnitSlice []units.Unit
+type UnitSlice []brreg.Unit
 
 func main() {
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))

@@ -1,4 +1,4 @@
-package units
+package brreg
 
 type Unit struct {
 	OrganisasjonsNummer                       string                   `json:"organisasjonsnummer"`
@@ -9,7 +9,7 @@ type Unit struct {
 	Naeringskode1                             NaeringsKode1            `json:"naeringskode1"`
 	Naeringskode2                             NaeringsKode2            `json:"naeringskode2"`
 	AntallAnsatte                             int                      `json:"antallAnsatte"`
-	ForretningsAdresse                        ForretningsAdresse       `json:"forretningsadresse"`
+	ForretningsAdresse                        Address                  `json:"forretningsadresse"`
 	StiftelsesDato                            string                   `json:"stiftelsesdato"`
 	InstitusjonellSektorKode                  InstitusjonellSektorKode `json:"institusjonellSektorKode"`
 	RegistrertIForetaksregisteret             bool                     `json:"registrertIForetaksregisteret"`
@@ -40,7 +40,7 @@ type NaeringsKode2 struct {
 	HjelpeenhetsKode string `json:"hjelpeenhetskode"`
 }
 
-type ForretningsAdresse struct {
+type Address struct {
 	Land          string   `json:"land"`
 	Landkode      string   `json:"landkode"`
 	Postnummer    string   `json:"postnummer"`
