@@ -12,11 +12,13 @@ var (
 )
 
 type Models struct {
-	Units UnitModel
+	Units    UnitModel
+	SubUnits SubUnitModel
 }
 
 func NewModels(db *sql.DB, logger *slog.Logger, timeout *time.Duration) Models {
 	return Models{
-		Units: UnitModel{DB: db, Logger: logger, Timeout: timeout},
+		Units:    UnitModel{DB: db, Logger: logger, Timeout: timeout},
+		SubUnits: SubUnitModel{DB: db, Logger: logger, Timeout: timeout},
 	}
 }
