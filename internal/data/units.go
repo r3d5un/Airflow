@@ -161,7 +161,7 @@ RETURNING id, last_updated, brreg_unit;`
 
 func (m *UnitModel) Update(ctx context.Context, u *Unit) (*Unit, error) {
 	query := `UPDATE brreg_units
-SET id = $2, last_updated = NOW(), brreg_unit = $4
+SET id = $1, last_updated = NOW(), brreg_unit = $2
 WHERE id = $1
 RETURNING id, last_updated, brreg_unit;
     `
