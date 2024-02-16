@@ -25,23 +25,9 @@ func main() {
 	slog.SetDefault(logger)
 
 	logger.Info("reading file")
-	file, err := os.ReadFile("./enheter_alle.json.gz")
+	unzippedData, err := read("./enheter_alle.json.gz")
 	if err != nil {
-		logger.Error("error reading file", "error", err)
-		os.Exit(1)
-	}
-
-	logger.Info("unzipping file")
-	reader := bytes.NewReader(file)
-	gzReader, err := gzip.NewReader(reader)
-	if err != nil {
-		logger.Error("error unzipping file", "error", err)
-		os.Exit(1)
-	}
-
-	unzippedData, err := io.ReadAll(gzReader)
-	if err != nil {
-		logger.Error("error reading unzipped data", "error", err)
+		fmt.Println("Error reading file", err)
 		os.Exit(1)
 	}
 
@@ -94,6 +80,26 @@ func main() {
 	wg.Wait()
 
 	logger.Info("all units upserted")
+}
+
+func read(path string) (d []byte, err error) {
+	file, err := os.ReadFile(path)
+	if err != nil {
+		return nil, err
+	}
+
+	reader := bytes.NewReader(file)
+	gzReader, err := gzip.NewReader(reader)
+	if err != nil {
+		return nil, err
+	}
+
+	d, err = io.ReadAll(gzReader)
+	if err != nil {
+		return nil, err
+	}
+
+	return d, nil
 }
 
 func openDB(dsn string) (*sql.DB, error) {
