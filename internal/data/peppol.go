@@ -59,3 +59,37 @@ WHERE id = $1;`
 	return &bc, nil
 
 }
+
+func (m *PeppolBusinessCardModel) Insert(ctx context.Context, bc *PeppolBusinessCard) (*PeppolBusinessCard, error) {
+	stmt := `INSERT INTO peppol_business_cards (id, name, countrycode, last_updated, business_cards)
+VALUES ($1, $2, $3, NOW(), $5)
+RETURNING id, name, countrycode, last_updated, business_cards;`
+
+	bcRaw, err := json.Marshal(bc.PeppolBusinessCard)
+	if err != nil {
+		m.Logger.ErrorContext(ctx, "error marshaling peppol_business_card", "error", err)
+		return nil, err
+	}
+
+	qCtx, cancel := context.WithTimeout(ctx, *m.Timeout)
+	defer cancel()
+
+	var jsonBc []byte
+
+	m.Logger.InfoContext(qCtx, "inserting peppol business card", "query", stmt, "id", bc.ID)
+	row := m.DB.QueryRowContext(ctx, stmt, bc.ID, bc.Name, bc.CountryCode, bcRaw)
+	err = row.Scan(&bc.ID, &bc.Name, &bc.CountryCode, &bc.LastUpdated, &jsonBc)
+	if err != nil {
+		m.Logger.ErrorContext(ctx, "error inserting peppol business card", "error", err)
+		return nil, err
+	}
+	m.Logger.InfoContext(ctx, "peppol business card inserted", "id", bc.ID)
+
+	err = json.Unmarshal(jsonBc, &bc.PeppolBusinessCard)
+	if err != nil {
+		m.Logger.ErrorContext(ctx, "error unmarshaling peppol_business_card", "error", err)
+		return nil, err
+	}
+
+	return bc, nil
+}
