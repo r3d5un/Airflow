@@ -93,3 +93,41 @@ RETURNING id, name, countrycode, last_updated, business_cards;`
 
 	return bc, nil
 }
+
+func (m *PeppolBusinessCardModel) Upsert(ctx context.Context, bc *PeppolBusinessCard) (*PeppolBusinessCard, error) {
+	stmt := `INSERT INTO peppol_business_cards (id, name, countrycode, last_updated, business_card)
+VALUES ($1, $2, $3, NOW(), $5)
+ON CONFLICT (id) DO UPDATE
+SET
+    name = EXCLUDED.name, countrycode = EXCLUDED.countrycode,
+    last_updated = NOW(), business_cards = EXCLUDED.business_card
+RETURNING id, name, countrycode, last_updated, business_card;`
+
+	bcRaw, err := json.Marshal(bc.PeppolBusinessCard)
+	if err != nil {
+		m.Logger.ErrorContext(ctx, "error marshaling peppol_business_card", "error", err)
+		return nil, err
+	}
+
+	qCtx, cancel := context.WithTimeout(ctx, *m.Timeout)
+	defer cancel()
+
+	var jsonBc []byte
+
+	m.Logger.InfoContext(qCtx, "upserting peppol business card", "query", stmt, "id", bc.ID)
+	row := m.DB.QueryRowContext(ctx, stmt, bc.ID, bc.Name, bc.CountryCode, bcRaw)
+	err = row.Scan(&bc.ID, &bc.Name, &bc.CountryCode, &bc.LastUpdated, &jsonBc)
+	if err != nil {
+		m.Logger.ErrorContext(ctx, "error upserting peppol business card", "error", err)
+		return nil, err
+	}
+	m.Logger.InfoContext(ctx, "peppol business card upserted", "id", bc.ID)
+
+	err = json.Unmarshal(jsonBc, &bc.PeppolBusinessCard)
+	if err != nil {
+		m.Logger.ErrorContext(ctx, "error unmarshaling peppol_business_card", "error", err)
+		return nil, err
+	}
+
+	return bc, nil
+}
