@@ -96,7 +96,7 @@ RETURNING id, name, countrycode, last_updated, business_card;`
 
 func (m *PeppolBusinessCardModel) Upsert(ctx context.Context, bc *PeppolBusinessCard) (*PeppolBusinessCard, error) {
 	stmt := `INSERT INTO peppol_business_cards (id, name, countrycode, last_updated, business_card)
-VALUES ($1, $2, $3, NOW(), $5)
+VALUES ($1, $2, $3, NOW(), $4)
 ON CONFLICT (id) DO UPDATE
 SET
     name = EXCLUDED.name, countrycode = EXCLUDED.countrycode,
