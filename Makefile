@@ -64,6 +64,6 @@ build/docker/brreg:
 publish/docker/brreg:
 	docker build -f ./dockerfiles/brreg.Dockerfile -t brreg:latest .
 	@echo 'Retag BRREG CLI app...'
-	docker tag brreg:latest ghcr.io/brreg/brreg:latest
+	docker tag brreg:latest ghcr.io/r3d5un/brreg:latest
 	@echo 'Publishing BRREG CLI app to ghcr.io...'
-	docker tag brreg:latest ghcr.io/brreg/brreg:latest
+	docker push ghcr.io/r3d5un/brreg:latest
