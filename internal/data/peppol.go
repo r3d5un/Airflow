@@ -131,3 +131,55 @@ RETURNING id, name, countrycode, last_updated, business_card;`
 
 	return bc, nil
 }
+
+func (m *PeppolBusinessCardModel) Update(ctx context.Context, bc *PeppolBusinessCard) (*PeppolBusinessCard, error) {
+	stmt := `UPDATE peppol_business_cards
+SET id = $1, name = $2, countrycode = $3, last_updated = NOW(), business_card = $4
+WHERE id = $1
+RETURNING id, name, countrycode, last_updated, business_card;
+    `
+
+	jsonBc, err := json.Marshal(bc.PeppolBusinessCard)
+	if err != nil {
+		return nil, err
+	}
+
+	args := []any{
+		bc.ID,
+		bc.Name,
+		bc.CountryCode,
+		jsonBc,
+	}
+
+	rCtx, cancel := context.WithTimeout(ctx, 3*time.Second)
+	defer cancel()
+
+	var bcRaw []byte
+
+	m.Logger.InfoContext(rCtx, "updating business card", "query", stmt, "args", args)
+	err = m.DB.QueryRowContext(ctx, stmt, args...).Scan(
+		&bc.ID, &bc.Name, &bc.CountryCode, &bc.LastUpdated, &bcRaw,
+	)
+	if err != nil {
+		switch {
+		case errors.Is(err, sql.ErrNoRows):
+			m.Logger.InfoContext(ctx, "no records found", "query", stmt, "args", args)
+			return nil, ErrNoRecord
+		default:
+			m.Logger.ErrorContext(
+				ctx, "unable to update business card",
+				"query", stmt, "args", args, "error", err,
+			)
+			return nil, err
+		}
+	}
+	m.Logger.InfoContext(rCtx, "updated brreg business card", "business_card", bc.PeppolBusinessCard)
+
+	err = json.Unmarshal(bcRaw, &bc.PeppolBusinessCard)
+	if err != nil {
+		m.Logger.ErrorContext(ctx, "error unmarshaling business card", "error", err)
+		return nil, err
+	}
+
+	return bc, nil
+}
