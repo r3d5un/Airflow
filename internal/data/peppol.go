@@ -26,7 +26,7 @@ type PeppolBusinessCardModel struct {
 }
 
 func (m *PeppolBusinessCardModel) Get(ctx context.Context, id string) (*PeppolBusinessCard, error) {
-	stmt := `SELECT id, name, countrycode, last_updated, business_cards
+	stmt := `SELECT id, name, countrycode, last_updated, business_card
 FROM peppol_business_cards
 WHERE id = $1;`
 
@@ -61,9 +61,9 @@ WHERE id = $1;`
 }
 
 func (m *PeppolBusinessCardModel) Insert(ctx context.Context, bc *PeppolBusinessCard) (*PeppolBusinessCard, error) {
-	stmt := `INSERT INTO peppol_business_cards (id, name, countrycode, last_updated, business_cards)
+	stmt := `INSERT INTO peppol_business_cards (id, name, countrycode, last_updated, business_card)
 VALUES ($1, $2, $3, NOW(), $5)
-RETURNING id, name, countrycode, last_updated, business_cards;`
+RETURNING id, name, countrycode, last_updated, business_card;`
 
 	bcRaw, err := json.Marshal(bc.PeppolBusinessCard)
 	if err != nil {
@@ -100,7 +100,7 @@ VALUES ($1, $2, $3, NOW(), $5)
 ON CONFLICT (id) DO UPDATE
 SET
     name = EXCLUDED.name, countrycode = EXCLUDED.countrycode,
-    last_updated = NOW(), business_cards = EXCLUDED.business_card
+    last_updated = NOW(), business_card = EXCLUDED.business_card
 RETURNING id, name, countrycode, last_updated, business_card;`
 
 	bcRaw, err := json.Marshal(bc.PeppolBusinessCard)
@@ -133,7 +133,7 @@ RETURNING id, name, countrycode, last_updated, business_card;`
 }
 
 func (m *PeppolBusinessCardModel) Update(ctx context.Context, bc *PeppolBusinessCard) (*PeppolBusinessCard, error) {
-	stmt := `UPDATE peppol_business_cards
+	stmt := `UPDATE peppol_business_card
 SET id = $1, name = $2, countrycode = $3, last_updated = NOW(), business_card = $4
 WHERE id = $1
 RETURNING id, name, countrycode, last_updated, business_card;
@@ -185,7 +185,7 @@ RETURNING id, name, countrycode, last_updated, business_card;
 }
 
 func (m *PeppolBusinessCardModel) Delete(ctx context.Context, id string) (*PeppolBusinessCard, error) {
-	query := `DELETE FROM peppol_business_cards
+	query := `DELETE FROM peppol_business_card
 WHERE id = $1
 RETURNING id, name, countrycode, last_updated, business_card;`
 
