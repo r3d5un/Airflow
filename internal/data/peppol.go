@@ -183,3 +183,42 @@ RETURNING id, name, countrycode, last_updated, business_card;
 
 	return bc, nil
 }
+
+func (m *PeppolBusinessCardModel) Delete(ctx context.Context, id string) (*PeppolBusinessCard, error) {
+	query := `DELETE FROM peppol_business_cards
+WHERE id = $1
+RETURNING id, name, countrycode, last_updated, business_card;`
+
+	rCtx, cancel := context.WithTimeout(ctx, 3*time.Second)
+	defer cancel()
+
+	var bc *PeppolBusinessCard
+	var bcRaw []byte
+
+	m.Logger.InfoContext(rCtx, "deleting business card", "query", query, "id", id)
+	err := m.DB.QueryRowContext(ctx, query, id).Scan(
+		&bc.ID, &bc.LastUpdated, &bcRaw,
+	)
+	if err != nil {
+		switch {
+		case errors.Is(err, sql.ErrNoRows):
+			m.Logger.InfoContext(ctx, "no records found", "query", query, "id", id)
+			return bc, ErrNoRecord
+		default:
+			m.Logger.ErrorContext(
+				ctx, "unable to update business card",
+				"query", query, "id", id, "error", err,
+			)
+			return nil, err
+		}
+	}
+	m.Logger.InfoContext(ctx, "business card deleted", "business_card", bc)
+
+	err = json.Unmarshal(bcRaw, &bc.PeppolBusinessCard)
+	if err != nil {
+		m.Logger.ErrorContext(ctx, "error unmarshaling business card", "error", err)
+		return bc, err
+	}
+
+	return bc, nil
+}
