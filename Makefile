@@ -54,3 +54,16 @@ run/docker/brreg/subunits:
 build/docker/brreg:
 	@echo 'Building containerized BRREG CLI app...'
 	docker build -f ./dockerfiles/brreg.Dockerfile -t brreg:latest .
+
+# ==================================================================================== #
+# PUBLISH
+# ==================================================================================== #
+
+## publish/docker/brreg: publish the brreg app to ghcr.io
+.PHONY: publish/docker/brreg
+publish/docker/brreg:
+	docker build -f ./dockerfiles/brreg.Dockerfile -t brreg:latest .
+	@echo 'Retag BRREG CLI app...'
+	docker tag brreg:latest ghcr.io/brreg/brreg:latest
+	@echo 'Publishing BRREG CLI app to ghcr.io...'
+	docker tag brreg:latest ghcr.io/brreg/brreg:latest
